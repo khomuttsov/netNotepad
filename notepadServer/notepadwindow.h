@@ -31,13 +31,17 @@ private slots:
     void on_files_currentRowChanged(int currentRow);
 
     void on_plainTextEdit_cursorPositionChanged();
+public slots:
+
+    void keyPressEventT(QKeyEvent* e);
 
 private:
     Ui::notepadWindow *ui;
     QTcpSocket *sok;
     quint16 blockSize;
+    QString current;
     int pos;
-    bool iRead, tChaing;
+    bool iRead, tChaing, iDoit;
 };
 
 #endif // NOTEPADWINDOW_H

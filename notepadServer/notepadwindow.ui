@@ -171,7 +171,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="plainTextEdit">
+     <widget class="textEditor" name="plainTextEdit">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -206,6 +206,13 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>textEditor</class>
+   <extends>QPlainTextEdit</extends>
+   <header>texteditor.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

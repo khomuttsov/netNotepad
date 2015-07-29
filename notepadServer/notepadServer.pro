@@ -16,11 +16,13 @@ SOURCES += main.cpp\
         notepadwindow.cpp \
     server/textcorefunc.cpp \
     server/user.cpp \
-    server/server.cpp
+    server/server.cpp \
+    texteditor.cpp
 
 HEADERS  += notepadwindow.h \
     server/textcorefunc.h \
     server/user.h \
-    server/server.h
+    server/server.h \
+    texteditor.h
 
 FORMS    += notepadwindow.ui
