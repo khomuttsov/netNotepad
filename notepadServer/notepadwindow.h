@@ -2,6 +2,8 @@
 #define NOTEPADWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
+
 #include "server/user.h"
 #include "server/textcorefunc.h"
 namespace Ui {

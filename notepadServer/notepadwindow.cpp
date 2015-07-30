@@ -16,6 +16,7 @@ notepadWindow::notepadWindow(QWidget *parent) :
     connect(sok, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
     connect(this, SIGNAL(readySend()), this, SLOT(send()));
     connect(ui->plainTextEdit, SIGNAL(keyPress(QKeyEvent*)), this, SLOT(keyPressEventT(QKeyEvent*)));
+    ui->filesBox->hide();
 }
 
 notepadWindow::~notepadWindow()
@@ -73,26 +74,35 @@ void notepadWindow::onSokReadyRead()
         in >> type >> start >> end >> diff;
         iRead = true;
         //обрабатываем
+        int lPos = pos;
         qDebug() << appdateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff);
         ui->plainTextEdit->setPlainText(appdateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff));
         QTextCursor tc= ui->plainTextEdit->textCursor();
-        tc.setPosition(pos);
+        if (start <= lPos){
+            lPos += end - start;
+        }
+        tc.setPosition(lPos);
         ui->plainTextEdit->setTextCursor(tc);
+
         iRead = false;
     }
+        break;
     case user::usersList:{
         QString users, files;
         in >> users >> files;
         QStringList l;
+        ui->users->clear();
         if (users != ""){
             l =  users.split(",");
             ui->users->addItems(l);
         }
+        ui->files->clear();
         if (files != ""){
             l =  files.split(",");
             ui->files->addItems(l);
         }
     }
+        break;
     case user::filesList:{
         QString files;
         in >> files;
@@ -101,6 +111,13 @@ void notepadWindow::onSokReadyRead()
         QStringList l =  files.split(",");
         ui->files->addItems(l);
     }
+    case user::errorNaimIsUsed:{
+        ui->connectDisConnect->setText("Подключиться");
+        QMessageBox::critical(this, "Ошибка соединения с сервером!", "Пользователь с таким именем уже существует.");
+        sok->disconnectFromHost();
+        ui->plainTextEdit->setEnabled(false);
+    }
+        break;
     default:
         break;
     }
@@ -116,11 +133,12 @@ void notepadWindow::on_connectDisConnect_clicked()
     if (ui->connectDisConnect->text() == "Подключиться"){
         ui->connectDisConnect->setText("Отключиться");
         sok->connectToHost(ui->ip->text(), ui->port->value());
-
+        ui->plainTextEdit->setEnabled(true);
     }
     else{
         ui->connectDisConnect->setText("Подключиться");
         sok->disconnectFromHost();
+        ui->plainTextEdit->setEnabled(false);
     }
 }
 

@@ -7,7 +7,7 @@ user::user(int desc, server *serv, QObject *parent) : QObject(parent)
     blockSize = 0;
     socket = new QTcpSocket(this);
     socket->setSocketDescriptor(desc);
-
+    currentFile = "test.cpp";
     connect(socket, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
@@ -54,7 +54,11 @@ void user::onConnect()
 
 void user::onDisconnect()
 {
-
+    host->clients.removeAll(this);
+    for (QList<user*>::iterator it = host->clients.begin();
+         it != host->clients.end(); ++it){
+        (*it)->sendUsers();
+    }
 }
 
 void user::onReadyRead()
@@ -102,9 +106,10 @@ void user::onReadyRead()
         this->name = name;
         isAutched = true;
         //отправляем новому клиенту список активных пользователей
-        sendUsers();
-
-       // sendFiles();
+        for (QList<user*>::iterator it = host->clients.begin();
+             it != host->clients.end(); ++it){
+            (*it)->sendUsers();
+        }
 
 
 
