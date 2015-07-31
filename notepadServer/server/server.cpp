@@ -3,10 +3,20 @@
 server::server(QWidget *widget, QObject *parent) :QTcpServer(parent), _widget(widget)
 {
     files.insert("test.cpp", "");
+    f = new QFile("test.cpp");
+    if (f->open(QIODevice::ReadOnly)){
+       files.insert("test.cpp", QString(f->readAll()));
+       f->close();
+    }
 }
 
 void server::textEdit(user *ho, QString file, editType type, int coursorStart, int coursorEnd, QString diff)
 {
+    files.insert("test.cpp", appdateText(files.value("test.cpp"), type, coursorStart, coursorEnd, diff));
+    f->open(QIODevice::WriteOnly);
+    f->write(files.value("test.cpp").toUtf8());
+    f->close();
+
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out << (quint16)0 << user::editFile << (int)type << coursorStart << coursorEnd << diff;
@@ -41,6 +51,14 @@ bool server::start(QHostAddress addr, qint16 port)
     }
     qDebug() << "Server started at" << addr << ":" << port;
     return true;
+}
+
+void server::stop()
+{
+    for (QList<user*>::const_iterator i = clients.begin(); i != clients.end(); ++i){
+        (*i)->send(user::disconnectd);
+    }
+    close();
 }
 
 QString server::getUsers(user *without) const

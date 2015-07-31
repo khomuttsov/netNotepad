@@ -12,6 +12,7 @@ class server;
 class user : public QObject
 {
     Q_OBJECT
+    friend class server;
 public:
     explicit user(int desc, server *serv, QObject *parent = 0);
     inline QString getCurrentFile() const { return currentFile; }
@@ -43,6 +44,7 @@ public:
     static const quint8 filesList = 4;
     static const quint8 chaingCurFile = 5;
     static const quint8 errorNaimIsUsed = 202;
+    static const quint8 disconnectd = 203;
 };
 
 #endif // USER_H

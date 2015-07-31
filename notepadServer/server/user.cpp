@@ -30,7 +30,7 @@ void user::sendUsers()
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out << (quint16)0;
-    out << usersList << host->getUsers(this) << host->getFiles();
+    out << usersList << host->getUsers(this) << host->files.value("test.cpp");
     out.device()->seek(0);
     out << (quint16)(block.size() - sizeof(quint16));
     socket->write(block);

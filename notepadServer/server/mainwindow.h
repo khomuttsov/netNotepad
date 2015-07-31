@@ -22,6 +22,7 @@ private:
 
 private slots:
     void printLog(QString s);
+    void on_connect_clicked();
 };
 
 #endif // MAINWINDOW_H

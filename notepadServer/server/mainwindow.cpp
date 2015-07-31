@@ -20,3 +20,20 @@ void MainWindow::printLog(QString s)
 {
     ui->log->append(s);
 }
+
+void MainWindow::on_connect_clicked()
+{
+    if (ui->connect->text() == "Остановить"){
+        s->stop();
+        ui->ip->setEnabled(true);
+        ui->port->setEnabled(true);
+        ui->connect->setText("Запустить");
+    }
+    else{
+        if (s->start(QHostAddress(ui->ip->text()), ui->port->value())){
+            ui->ip->setEnabled(false);
+            ui->port->setEnabled(false);
+            ui->connect->setText("Остановить");
+        }
+    }
+}

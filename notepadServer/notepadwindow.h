@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
-
+#include <QFileDialog>
 #include "server/user.h"
 #include "server/textcorefunc.h"
 namespace Ui {
@@ -36,7 +36,8 @@ private slots:
 public slots:
 
     void keyPressEventT(QKeyEvent* e);
-
+    void saveB();
+    bool save();
 private:
     Ui::notepadWindow *ui;
     QTcpSocket *sok;

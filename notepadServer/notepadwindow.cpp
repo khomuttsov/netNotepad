@@ -16,6 +16,7 @@ notepadWindow::notepadWindow(QWidget *parent) :
     connect(sok, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
     connect(this, SIGNAL(readySend()), this, SLOT(send()));
     connect(ui->plainTextEdit, SIGNAL(keyPress(QKeyEvent*)), this, SLOT(keyPressEventT(QKeyEvent*)));
+    connect(ui->save, SIGNAL(triggered(bool)), this, SLOT(saveB()));
     ui->filesBox->hide();
 }
 
@@ -41,7 +42,16 @@ void notepadWindow::onSokConnected()
 
 void notepadWindow::onSokDisconnected()
 {
+    ui->plainTextEdit->setEnabled(false);
+    ui->ip->setEnabled(true);
+    ui->port->setEnabled(true);
+    ui->connectDisConnect->setText("Подключиться");
+    if (QMessageBox::Ok == QMessageBox::warning(this, "Соединение с сервером было потеряно", "Вы хотите сохранить документ в файл?", QMessageBox::Ok, QMessageBox::Cancel)){
+        if (!save())
+            QMessageBox::critical(this, "Что-то пошло не так!", "Не удалось сохранить файл");
 
+    }
+    ui->plainTextEdit->clear();
 }
 
 void notepadWindow::onSokReadyRead()
@@ -96,11 +106,8 @@ void notepadWindow::onSokReadyRead()
             l =  users.split(",");
             ui->users->addItems(l);
         }
-        ui->files->clear();
-        if (files != ""){
-            l =  files.split(",");
-            ui->files->addItems(l);
-        }
+        if (ui->plainTextEdit->toPlainText().isEmpty())
+            ui->plainTextEdit->setPlainText(files);
     }
         break;
     case user::filesList:{
@@ -116,6 +123,10 @@ void notepadWindow::onSokReadyRead()
         QMessageBox::critical(this, "Ошибка соединения с сервером!", "Пользователь с таким именем уже существует.");
         sok->disconnectFromHost();
         ui->plainTextEdit->setEnabled(false);
+    }
+        break;
+    case user::disconnectd:{
+        sok->disconnect();
     }
         break;
     default:
@@ -205,4 +216,23 @@ void notepadWindow::keyPressEventT(QKeyEvent *e)
 
     }
     tChaing = true;
+}
+
+void notepadWindow::saveB()
+{
+    if (!save())
+        QMessageBox::critical(this, "Что-то пошло не так!", "Не удалось сохранить файл");
+}
+
+bool notepadWindow::save()
+{
+    QString ff = QFileDialog::getSaveFileName(this, "Выберете файл в который будет произведено сохранение","","*");
+    if (ff.isEmpty())
+        return false;
+    QFile f(ff);
+    if (!f.open(QIODevice::WriteOnly))
+        return false;
+    f.write(ui->plainTextEdit->toPlainText().toUtf8());
+    f.close();
+    return true;
 }
