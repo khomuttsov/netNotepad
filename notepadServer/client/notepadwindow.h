@@ -43,7 +43,7 @@ private:
     QTcpSocket *sok;
     quint16 blockSize;
     QString current;
-    int pos;
+    int pos, lastPos;
     bool iRead, tChaing, iDoit;
 };
 

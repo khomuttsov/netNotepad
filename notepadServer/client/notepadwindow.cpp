@@ -98,6 +98,7 @@ void notepadWindow::onSokReadyRead()
     }
         break;
     case user::usersList:{
+        iRead = true;
         QString users, files;
         in >> users >> files;
         QStringList l;
@@ -106,8 +107,11 @@ void notepadWindow::onSokReadyRead()
             l =  users.split(",");
             ui->users->addItems(l);
         }
-        if (ui->plainTextEdit->toPlainText().isEmpty())
+        if (ui->plainTextEdit->toPlainText().isEmpty()){
             ui->plainTextEdit->setPlainText(files);
+            current = files;
+        }
+        iRead = false;
     }
         break;
     case user::filesList:{
@@ -116,6 +120,7 @@ void notepadWindow::onSokReadyRead()
         if (files == "")
             return;
         QStringList l =  files.split(",");
+
         ui->files->addItems(l);
     }
     case user::errorNaimIsUsed:{
@@ -160,7 +165,22 @@ void notepadWindow::on_files_currentTextChanged(const QString &currentText)
 
 void notepadWindow::on_plainTextEdit_textChanged()
 {
+    tChaing = true;
+    if (!iRead && current != ui->plainTextEdit->toPlainText()){
+        QByteArray block;
+        int localPos = lastPos;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        editType et;
+        QString text = ui->plainTextEdit->toPlainText();
+        QString diff = getDiff(text , localPos, ui->plainTextEdit->textCursor().position(), et);
+        out << (quint16)0 << user::editFile << (int)et << localPos << ui->plainTextEdit->textCursor().position() << diff;
+        out.device()->seek(0);
+        out << (quint16)(block.size() - sizeof(quint16));
+        sok->write(block);
+        current = ui->plainTextEdit->toPlainText();
 
+    }
+    tChaing = false;
 }
 
 void notepadWindow::on_files_currentRowChanged(int currentRow)
@@ -179,22 +199,10 @@ void notepadWindow::on_files_currentRowChanged(int currentRow)
 
 void notepadWindow::on_plainTextEdit_cursorPositionChanged()
 {
-    tChaing = true;
-    if (!iRead && current != ui->plainTextEdit->toPlainText()){
-        QByteArray block;
-        int localPos = pos;
-        QDataStream out(&block, QIODevice::WriteOnly);
-        editType et;
-        QString text = ui->plainTextEdit->toPlainText();
-        QString diff = getDiff(text , pos,ui->plainTextEdit->textCursor().position(), et);
-        out << (quint16)0 << user::editFile << (int)et << localPos << ui->plainTextEdit->textCursor().position() << diff;
-        out.device()->seek(0);
-        out << (quint16)(block.size() - sizeof(quint16));
-        sok->write(block);
-        current = ui->plainTextEdit->toPlainText();
-    }
+
+    lastPos = pos;
     pos = ui->plainTextEdit->textCursor().position();
-    tChaing = false;
+
 }
 
 
