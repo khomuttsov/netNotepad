@@ -85,8 +85,8 @@ void notepadWindow::onSokReadyRead()
         iRead = true;
         //обрабатываем
         int lPos = pos;
-        qDebug() << appdateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff);
-        ui->plainTextEdit->setPlainText(appdateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff));
+        qDebug() << updateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff);
+        ui->plainTextEdit->setPlainText(updateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff));
         QTextCursor tc= ui->plainTextEdit->textCursor();
         if (start <= lPos){
             lPos += end - start;
@@ -220,7 +220,7 @@ void notepadWindow::keyPressEventT(QKeyEvent *e)
         out.device()->seek(0);
         out << (quint16)(block.size() - sizeof(quint16));
         sok->write(block);
-        current = appdateText(ui->plainTextEdit->toPlainText(), et, localPos, localPos, diff);
+        current = updateText(ui->plainTextEdit->toPlainText(), et, localPos, localPos, diff);
 
     }
     tChaing = true;

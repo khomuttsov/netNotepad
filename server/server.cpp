@@ -12,7 +12,7 @@ server::server(QWidget *widget, QObject *parent) :QTcpServer(parent), _widget(wi
 
 void server::textEdit(user *ho, QString file, editType type, int coursorStart, int coursorEnd, QString diff)
 {
-    files.insert("test.cpp", appdateText(files.value("test.cpp"), type, coursorStart, coursorEnd, diff));
+    files.insert("test.cpp", updateText(files.value("test.cpp"), type, coursorStart, coursorEnd, diff));
     f->open(QIODevice::WriteOnly);
     f->write(files.value("test.cpp").toUtf8());
     f->close();

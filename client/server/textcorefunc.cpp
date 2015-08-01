@@ -2,19 +2,19 @@
 
 
 
-QString appdateText(const QString &t, editType type, int start, int end, QString diff)
+QString updateText(const QString &t, editType type, int start, int end, QString diff)
 {
     QString buffer;
     switch (type) {
-    case inser:
+    case INSERT:
         buffer = t.mid(0, start);
         buffer += diff;
         buffer += t.mid(start);
         break;
-    case bacspace:
+    case BACKSPACE:
         buffer = t.mid(0, end) + t.mid(start);
         break;
-    case delet:
+    case DELETE:
         buffer = t.mid(0, start) + t.mid(start+1);
         break;
     default:
@@ -28,14 +28,14 @@ QString getDiff(QString &t, int start, int end, editType &type)
 {
     QString res;
     if (start < end){
-        type = inser;
+        type = INSERT;
         res = t.mid(start, end - start);
     }
     else if (start == end){
-        type = delet;
+        type = DELETE;
     }
     else {
-        type = bacspace;
+        type = BACKSPACE;
     }
     return res;
 }
