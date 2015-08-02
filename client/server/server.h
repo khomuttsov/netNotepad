@@ -25,7 +25,7 @@ public:
      * \param coursorEnd -конец
      * \param diff -разница
      */
-    void textEdit(user* ho, editType type, int coursorStart, int coursorEnd, QString diff);
+    void textEdit(user* ho, editType type, int coursorStart, int coursorEnd, int anchor, QString diff);
     /*!
      * \brief textEdit - обработать блок изменений текста
      * \param ho - от какого пользователя

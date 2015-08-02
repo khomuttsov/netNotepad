@@ -9,16 +9,16 @@ server::server(QObject *parent) :QTcpServer(parent)
     }
 }
 
-void server::textEdit(user *ho, editType type, int coursorStart, int coursorEnd, QString diff)
+void server::textEdit(user *ho, editType type, int coursorStart, int coursorEnd, int anchor, QString diff)
 {
-    file = updateText(file, type, coursorStart, coursorEnd, diff);
+    file = updateText(file, type, coursorStart, coursorEnd, anchor, diff);
     f->open(QIODevice::WriteOnly);
     f->write(file.toUtf8());
     f->close();
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << user::editFile << (int)type << coursorStart << coursorEnd << diff;
+    out << user::editFile << (int)type << coursorStart << coursorEnd << anchor << diff;
 
 
     for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
@@ -34,6 +34,8 @@ void server::textEdit(user *ho, QList<QByteArray> comands)
     int type;
     int coursorStart;
     int coursorEnd;
+    int anchor;
+    quint8 ct;
     QString diff;
 
     QList<QByteArray> comands1 = comands;
@@ -41,8 +43,8 @@ void server::textEdit(user *ho, QList<QByteArray> comands)
     while(!comands1.isEmpty()){
         b = comands1.takeAt(0);
         QDataStream in1(&b, QIODevice::ReadOnly);
-        in1 >> type >> coursorStart >> coursorEnd >> diff;
-        file = updateText(file, (editType)type, coursorStart, coursorEnd, diff);
+        in1 >> ct >> type >> coursorStart >> coursorEnd >> anchor >> diff;
+        file = updateText(file, (editType)type, coursorStart, coursorEnd, anchor, diff);
     }
     f->open(QIODevice::WriteOnly);
     f->write(file.toUtf8());

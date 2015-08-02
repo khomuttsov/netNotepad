@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_notepadWindow_t {
-    QByteArrayData data[17];
-    char stringdata[263];
+    QByteArrayData data[18];
+    char stringdata[250];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -38,24 +38,24 @@ QT_MOC_LITERAL(5, 63, 17), // "onSokDisplayError"
 QT_MOC_LITERAL(6, 81, 28), // "QAbstractSocket::SocketError"
 QT_MOC_LITERAL(7, 110, 11), // "socketError"
 QT_MOC_LITERAL(8, 122, 28), // "on_connectDisConnect_clicked"
-QT_MOC_LITERAL(9, 151, 28), // "on_plainTextEdit_textChanged"
-QT_MOC_LITERAL(10, 180, 38), // "on_plainTextEdit_cursorPositi..."
-QT_MOC_LITERAL(11, 219, 4), // "send"
-QT_MOC_LITERAL(12, 224, 14), // "keyPressEventT"
-QT_MOC_LITERAL(13, 239, 10), // "QKeyEvent*"
-QT_MOC_LITERAL(14, 250, 1), // "e"
-QT_MOC_LITERAL(15, 252, 5), // "saveB"
-QT_MOC_LITERAL(16, 258, 4) // "save"
+QT_MOC_LITERAL(9, 151, 13), // "onTextChanged"
+QT_MOC_LITERAL(10, 165, 38), // "on_plainTextEdit_cursorPositi..."
+QT_MOC_LITERAL(11, 204, 4), // "send"
+QT_MOC_LITERAL(12, 209, 14), // "keyPressEventT"
+QT_MOC_LITERAL(13, 224, 10), // "QKeyEvent*"
+QT_MOC_LITERAL(14, 235, 1), // "e"
+QT_MOC_LITERAL(15, 237, 1), // "a"
+QT_MOC_LITERAL(16, 239, 5), // "saveB"
+QT_MOC_LITERAL(17, 245, 4) // "save"
 
     },
     "notepadWindow\0onSokConnected\0\0"
     "onSokDisconnected\0onSokReadyRead\0"
     "onSokDisplayError\0QAbstractSocket::SocketError\0"
     "socketError\0on_connectDisConnect_clicked\0"
-    "on_plainTextEdit_textChanged\0"
-    "on_plainTextEdit_cursorPositionChanged\0"
-    "send\0keyPressEventT\0QKeyEvent*\0e\0saveB\0"
-    "save"
+    "onTextChanged\0on_plainTextEdit_cursorPositionChanged\0"
+    "send\0keyPressEventT\0QKeyEvent*\0e\0a\0"
+    "saveB\0save"
 };
 #undef QT_MOC_LITERAL
 
@@ -81,9 +81,9 @@ static const uint qt_meta_data_notepadWindow[] = {
        9,    0,   76,    2, 0x08 /* Private */,
       10,    0,   77,    2, 0x08 /* Private */,
       11,    0,   78,    2, 0x08 /* Private */,
-      12,    1,   79,    2, 0x0a /* Public */,
-      15,    0,   82,    2, 0x0a /* Public */,
-      16,    0,   83,    2, 0x0a /* Public */,
+      12,    2,   79,    2, 0x0a /* Public */,
+      16,    0,   84,    2, 0x0a /* Public */,
+      17,    0,   85,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void,
@@ -94,7 +94,7 @@ static const uint qt_meta_data_notepadWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 13,   14,
+    QMetaType::Void, 0x80000000 | 13, QMetaType::Int,   14,   15,
     QMetaType::Void,
     QMetaType::Bool,
 
@@ -111,10 +111,10 @@ void notepadWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _i
         case 2: _t->onSokReadyRead(); break;
         case 3: _t->onSokDisplayError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
         case 4: _t->on_connectDisConnect_clicked(); break;
-        case 5: _t->on_plainTextEdit_textChanged(); break;
+        case 5: _t->onTextChanged(); break;
         case 6: _t->on_plainTextEdit_cursorPositionChanged(); break;
         case 7: _t->send(); break;
-        case 8: _t->keyPressEventT((*reinterpret_cast< QKeyEvent*(*)>(_a[1]))); break;
+        case 8: _t->keyPressEventT((*reinterpret_cast< QKeyEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         case 9: _t->saveB(); break;
         case 10: { bool _r = _t->save();
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;

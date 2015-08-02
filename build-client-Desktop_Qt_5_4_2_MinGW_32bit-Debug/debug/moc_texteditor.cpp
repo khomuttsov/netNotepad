@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_textEditor_t {
-    QByteArrayData data[6];
-    char stringdata[48];
+    QByteArrayData data[7];
+    char stringdata[51];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -34,10 +34,11 @@ QT_MOC_LITERAL(1, 11, 8), // "keyPress"
 QT_MOC_LITERAL(2, 20, 0), // ""
 QT_MOC_LITERAL(3, 21, 10), // "QKeyEvent*"
 QT_MOC_LITERAL(4, 32, 1), // "e"
-QT_MOC_LITERAL(5, 34, 13) // "keyPressEvent"
+QT_MOC_LITERAL(5, 34, 2), // "as"
+QT_MOC_LITERAL(6, 37, 13) // "keyPressEvent"
 
     },
-    "textEditor\0keyPress\0\0QKeyEvent*\0e\0"
+    "textEditor\0keyPress\0\0QKeyEvent*\0e\0as\0"
     "keyPressEvent"
 };
 #undef QT_MOC_LITERAL
@@ -56,13 +57,13 @@ static const uint qt_meta_data_textEditor[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   24,    2, 0x06 /* Public */,
+       1,    2,   24,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       5,    1,   27,    2, 0x0a /* Public */,
+       6,    1,   29,    2, 0x0a /* Public */,
 
  // signals: parameters
-    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, 0x80000000 | 3, QMetaType::Int,    4,    5,
 
  // slots: parameters
     QMetaType::Void, 0x80000000 | 3,    4,
@@ -75,7 +76,7 @@ void textEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     if (_c == QMetaObject::InvokeMetaMethod) {
         textEditor *_t = static_cast<textEditor *>(_o);
         switch (_id) {
-        case 0: _t->keyPress((*reinterpret_cast< QKeyEvent*(*)>(_a[1]))); break;
+        case 0: _t->keyPress((*reinterpret_cast< QKeyEvent*(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
         case 1: _t->keyPressEvent((*reinterpret_cast< QKeyEvent*(*)>(_a[1]))); break;
         default: ;
         }
@@ -83,7 +84,7 @@ void textEditor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (textEditor::*_t)(QKeyEvent * );
+            typedef void (textEditor::*_t)(QKeyEvent * , int );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&textEditor::keyPress)) {
                 *result = 0;
             }
@@ -128,9 +129,9 @@ int textEditor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void textEditor::keyPress(QKeyEvent * _t1)
+void textEditor::keyPress(QKeyEvent * _t1, int _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_END_MOC_NAMESPACE

@@ -207,6 +207,7 @@ public:
         plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
         plainTextEdit->setEnabled(false);
         plainTextEdit->setMinimumSize(QSize(250, 0));
+        plainTextEdit->setContextMenuPolicy(Qt::NoContextMenu);
 
         horizontalLayout_5->addWidget(plainTextEdit);
 

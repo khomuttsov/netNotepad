@@ -17,7 +17,8 @@ notepadWindow::notepadWindow(QWidget *parent) :
     connect(sok, SIGNAL(disconnected()), this, SLOT(onSokDisconnected()));
     connect(sok, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
     connect(this, SIGNAL(readySend()), this, SLOT(send()));
-    connect(ui->plainTextEdit, SIGNAL(keyPress(QKeyEvent*)), this, SLOT(keyPressEventT(QKeyEvent*)));
+    connect(ui->plainTextEdit, SIGNAL(keyPress(QKeyEvent*, int)), this, SLOT(keyPressEventT(QKeyEvent*, int)));
+    connect(ui->plainTextEdit, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
     connect(ui->save, SIGNAL(triggered(bool)), this, SLOT(saveB()));
     connect(t, SIGNAL(timeout()), this, SLOT(send()));
     ui->filesBox->hide();
@@ -100,7 +101,7 @@ void notepadWindow::on_connectDisConnect_clicked()
     }
 }
 
-void notepadWindow::on_plainTextEdit_textChanged()
+void notepadWindow::onTextChanged()
 {
     tChaing = true;
     if (!iRead && current != ui->plainTextEdit->toPlainText()){
@@ -109,8 +110,8 @@ void notepadWindow::on_plainTextEdit_textChanged()
         QDataStream out(&block, QIODevice::WriteOnly);
         editType et;
         QString text = ui->plainTextEdit->toPlainText();
-        QString diff = getDiff(text , localPos, ui->plainTextEdit->textCursor().position(), et);
-        out << user::editFile << (int)et << localPos << ui->plainTextEdit->textCursor().position() << diff;
+        QString diff = getDiff(text , localPos, ui->plainTextEdit->textCursor().position(), arPos, et);
+        out << user::editFile << (int)et << localPos << ui->plainTextEdit->textCursor().position() << arPos <<  diff;
         textEditList.append(block);
         current = ui->plainTextEdit->toPlainText();
 
@@ -137,19 +138,21 @@ void notepadWindow::send()
 }
 
 
-void notepadWindow::keyPressEventT(QKeyEvent *e)
+void notepadWindow::keyPressEventT(QKeyEvent *e, int a)
 {
     tChaing = true;
+    arPos = a;
     if (e->key() == Qt::Key_Delete){
+
         QByteArray block;
         int localPos = pos;
         QDataStream out(&block, QIODevice::WriteOnly);
         editType et;
         QString text = ui->plainTextEdit->toPlainText();
-        QString diff = getDiff(text , pos, pos, et);
-        out << user::editFile << (int)et << localPos << localPos << diff;
+        QString diff = getDiff(text , pos, pos, arPos, et);
+        out << user::editFile << (int)et << localPos << localPos << a << diff;
         textEditList.append(block);
-        current = updateText(ui->plainTextEdit->toPlainText(), et, localPos, localPos, diff);
+        current = updateText(ui->plainTextEdit->toPlainText(), et, localPos, localPos, arPos, diff);
 
     }
     tChaing = true;
@@ -174,17 +177,17 @@ bool notepadWindow::save()
     return true;
 }
 
-void notepadWindow::doComand(qint8 com, QDataStream &in)
+void notepadWindow::doComand(quint8 com, QDataStream &in)
 {
     switch (com) {
     case user::editFile:{
         QString diff;
-        int type, start, end;
-        in >> type >> start >> end >> diff;
+        int type, start, end, anchor;
+        in >> type >> start >> end >> anchor >> diff;
         iRead = true;
         //обрабатываем
         int lPos = pos;
-        ui->plainTextEdit->setPlainText(updateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff));
+        ui->plainTextEdit->setPlainText(updateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, anchor, diff));
         QTextCursor tc= ui->plainTextEdit->textCursor();
         if (start <= lPos){
             lPos += end - start;

@@ -43,9 +43,9 @@ private slots:
      */
     void on_connectDisConnect_clicked();
     /*!
-     * \brief on_plainTextEdit_textChanged - обработчик изменений текста
+     * \brief onTextChanged - обработчик изменений текста
      */
-    void on_plainTextEdit_textChanged();
+    void onTextChanged();
     /*!
      * \brief on_plainTextEdit_cursorPositionChanged - обработчик изменения положения курсора
      */
@@ -59,7 +59,7 @@ public slots:
      * \brief keyPressEventT - обработчик нажатия на клавишу в редакторе
      * \param e
      */
-    void keyPressEventT(QKeyEvent* e);
+    void keyPressEventT(QKeyEvent* e, int a);
     /*!
      * \brief saveB - кнопка сохранения
      */
@@ -82,7 +82,7 @@ private:
     /*!
      * \brief pos, lastPos - позиции курсора
      */
-    int pos, lastPos;
+    int pos, lastPos, arPos;
     /*!
      * \brief iRead, tChaing, iDoit, haveError - флаги
      */
@@ -100,7 +100,7 @@ private:
      * \param com
      * \param in
      */
-    void doComand(qint8 com, QDataStream &in);
+    void doComand(quint8 com, QDataStream &in);
 };
 
 #endif // NOTEPADWINDOW_H
