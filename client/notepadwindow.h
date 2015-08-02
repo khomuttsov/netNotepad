@@ -39,27 +39,28 @@ private slots:
      */
     void onSokDisplayError(QAbstractSocket::SocketError socketError);
     /*!
-     * \brief on_connectDisConnect_clicked - подключить отключить клиент
+     * \brief onConnectDisConnectClicked - подключить отключить клиент
      */
-    void on_connectDisConnect_clicked();
+    void onConnectDisConnectClicked();
     /*!
      * \brief onTextChanged - обработчик изменений текста
      */
     void onTextChanged();
     /*!
-     * \brief on_plainTextEdit_cursorPositionChanged - обработчик изменения положения курсора
+     * \brief onPlainTextEditCursorPositionChanged - обработчик изменения положения курсора
      */
-    void on_plainTextEdit_cursorPositionChanged();
+    void onPlainTextEditCursorPositionChanged();
     /*!
      * \brief send - отправка блока сообщений
      */
     void send();
 public slots:
     /*!
-     * \brief keyPressEventT - обработчик нажатия на клавишу в редакторе
-     * \param e
+     * \brief keyPressEvent - обработчик нажатия на клавишу в редакторе
+     * \param e - клавиша
+     * \param a - якорь который был установлен до нажатия клавиши
      */
-    void keyPressEventT(QKeyEvent* e, int a);
+    void keyPressEvent(QKeyEvent* e, int a);
     /*!
      * \brief saveB - кнопка сохранения
      */
@@ -97,8 +98,8 @@ private:
     QTimer *t;
     /*!
      * \brief doComand - обработчик одного действия
-     * \param com
-     * \param in
+     * \param com - команда которую нужно выполнить
+     * \param in - поток входа аргументов
      */
     void doComand(quint8 com, QDataStream &in);
 };

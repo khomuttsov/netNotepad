@@ -12,13 +12,15 @@ notepadWindow::notepadWindow(QWidget *parent) :
     sok = new QTcpSocket(this);
     pos = 0;
     t = new QTimer;
+    connect(ui->connectDisConnect, SIGNAL(clicked(bool)), this, SLOT(onConnectDisConnectClicked()));
     connect(sok, SIGNAL(readyRead()), this, SLOT(onSokReadyRead()));
     connect(sok, SIGNAL(connected()), this, SLOT(onSokConnected()));
     connect(sok, SIGNAL(disconnected()), this, SLOT(onSokDisconnected()));
     connect(sok, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
     connect(this, SIGNAL(readySend()), this, SLOT(send()));
-    connect(ui->plainTextEdit, SIGNAL(keyPress(QKeyEvent*, int)), this, SLOT(keyPressEventT(QKeyEvent*, int)));
+    connect(ui->plainTextEdit, SIGNAL(keyPress(QKeyEvent*, int)), this, SLOT(keyPressEvent(QKeyEvent*, int)));
     connect(ui->plainTextEdit, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    connect(ui->plainTextEdit, SIGNAL(cursorPositionChanged()), this, SLOT(onPlainTextEditCursorPositionChanged()));
     connect(ui->save, SIGNAL(triggered(bool)), this, SLOT(saveB()));
     connect(t, SIGNAL(timeout()), this, SLOT(send()));
     ui->filesBox->hide();
@@ -89,7 +91,7 @@ void notepadWindow::onSokDisplayError(QAbstractSocket::SocketError socketError)
     qDebug() << socketError;
 }
 
-void notepadWindow::on_connectDisConnect_clicked()
+void notepadWindow::onConnectDisConnectClicked()
 {
     if (ui->connectDisConnect->text() == "Подключиться"){
         sok->connectToHost(ui->ip->text(), ui->port->value());
@@ -119,7 +121,7 @@ void notepadWindow::onTextChanged()
     tChaing = false;
 }
 
-void notepadWindow::on_plainTextEdit_cursorPositionChanged()
+void notepadWindow::onPlainTextEditCursorPositionChanged()
 {
 
     lastPos = pos;
@@ -138,7 +140,7 @@ void notepadWindow::send()
 }
 
 
-void notepadWindow::keyPressEventT(QKeyEvent *e, int a)
+void notepadWindow::keyPressEvent(QKeyEvent *e, int a)
 {
     tChaing = true;
     arPos = a;
