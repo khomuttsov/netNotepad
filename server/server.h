@@ -15,6 +15,7 @@ public:
     friend class user;
     explicit server(QWidget *widget = 0, QObject *parent = 0);
     void textEdit(user* ho, QString file, editType type, int coursorStart, int coursorEnd, QString diff);
+    void textEdit(user *ho, QList<QByteArray> comands);
     bool isNameUsed(QString n) const;
     bool start(QHostAddress addr, qint16 port);
     void stop();

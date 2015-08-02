@@ -19,14 +19,44 @@ void server::textEdit(user *ho, QString file, editType type, int coursorStart, i
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << (quint16)0 << user::editFile << (int)type << coursorStart << coursorEnd << diff;
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
+    out << user::editFile << (int)type << coursorStart << coursorEnd << diff;
 
 
     for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
         emit log ((*i)->getCurrentFile() +" "+ (*i)->getName() + " " + QString::number((int)(*i)->isAutchedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
         if ((*i)->isAutchedUser() && *i != ho && (*i)->getCurrentFile() == file){
+            (*i)->getSocket()->write(block);
+        }
+    }
+}
+
+void server::textEdit(user *ho, QList<QByteArray> comands)
+{
+    int type;
+    int coursorStart;
+    int coursorEnd;
+    QString diff;
+
+    QList<QByteArray> comands1 = comands;
+    QByteArray b;
+    while(!comands1.isEmpty()){
+        b = comands1.takeAt(0);
+        QDataStream in1(&b, QIODevice::ReadOnly);
+        in1 >> type >> coursorStart >> coursorEnd >> diff;
+        files.insert("test.cpp", updateText(files.value("test.cpp"), (editType)type, coursorStart, coursorEnd, diff));
+    }
+    f->open(QIODevice::WriteOnly);
+    f->write(files.value("test.cpp").toUtf8());
+    f->close();
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out << user::list << comands;
+
+
+    for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
+        emit log ((*i)->getCurrentFile() +" "+ (*i)->getName() + " " + QString::number((int)(*i)->isAutchedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
+        if ((*i)->isAutchedUser() && *i != ho){
             (*i)->getSocket()->write(block);
         }
     }

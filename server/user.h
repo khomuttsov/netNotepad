@@ -43,6 +43,7 @@ public:
     static const quint8 usersList = 3;
     static const quint8 filesList = 4;
     static const quint8 chaingCurFile = 5;
+    static const quint8 list = 6;
     static const quint8 errorNaimIsUsed = 202;
     static const quint8 disconnectd = 203;
 };

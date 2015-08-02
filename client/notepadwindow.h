@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include "server/user.h"
 #include "server/textcorefunc.h"
+#include <QTimer>
 namespace Ui {
 class notepadWindow;
 }
@@ -33,6 +34,7 @@ private slots:
     void on_files_currentRowChanged(int currentRow);
 
     void on_plainTextEdit_cursorPositionChanged();
+    void send();
 public slots:
 
     void keyPressEventT(QKeyEvent* e);
@@ -45,6 +47,10 @@ private:
     QString current;
     int pos, lastPos;
     bool iRead, tChaing, iDoit;
+    QList<QByteArray> textEditList;
+    QTimer *t;
+
+    void doComand(qint8 com, QDataStream &in);
 };
 
 #endif // NOTEPADWINDOW_H

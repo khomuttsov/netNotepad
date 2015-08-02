@@ -10,6 +10,7 @@ notepadWindow::notepadWindow(QWidget *parent) :
     tChaing = false;
     sok = new QTcpSocket(this);
     pos = 0;
+    t = new QTimer;
     connect(sok, SIGNAL(readyRead()), this, SLOT(onSokReadyRead()));
     connect(sok, SIGNAL(connected()), this, SLOT(onSokConnected()));
     connect(sok, SIGNAL(disconnected()), this, SLOT(onSokDisconnected()));
@@ -17,6 +18,7 @@ notepadWindow::notepadWindow(QWidget *parent) :
     connect(this, SIGNAL(readySend()), this, SLOT(send()));
     connect(ui->plainTextEdit, SIGNAL(keyPress(QKeyEvent*)), this, SLOT(keyPressEventT(QKeyEvent*)));
     connect(ui->save, SIGNAL(triggered(bool)), this, SLOT(saveB()));
+    connect(t, SIGNAL(timeout()), this, SLOT(send()));
     ui->filesBox->hide();
 }
 
@@ -32,12 +34,10 @@ void notepadWindow::onSokConnected()
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << (quint16)0;
     out << (quint8)user::autch;
     out <<  ui->login->text();
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
     sok->write(block);
+    t->start(500);
 }
 
 void notepadWindow::onSokDisconnected()
@@ -57,86 +57,25 @@ void notepadWindow::onSokDisconnected()
 void notepadWindow::onSokReadyRead()
 {
     QDataStream in(sok);
-    //если считываем новый блок первые 2 байта это его размер
-    if (blockSize == 0) {
-        //если пришло меньше 2 байт ждем пока будет 2 байта
-        if (sok->bytesAvailable() < (int)sizeof(quint16))
-            return;
-        //считываем размер (2 байта)
-        in >> blockSize;
-        qDebug() << "_blockSize now " << blockSize;
-    }
-    //ждем пока блок прийдет полностью
-    if (sok->bytesAvailable() < blockSize)
-        return;
-    else
-        //можно принимать новый блок
-        blockSize = 0;
     //3 байт - команда серверу
     quint8 command;
     in >> command;
-    qDebug() << "Received command " << command;
 
-    switch (command) {
-    case user::editFile:{
-        QString diff;
-        int type, start, end;
-        in >> type >> start >> end >> diff;
-        iRead = true;
-        //обрабатываем
-        int lPos = pos;
-        qDebug() << updateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff);
-        ui->plainTextEdit->setPlainText(updateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff));
-        QTextCursor tc= ui->plainTextEdit->textCursor();
-        if (start <= lPos){
-            lPos += end - start;
+    if (command != user::list){
+        doComand(command , in);
+    }
+    else{
+        QList<QByteArray> comands;
+        QByteArray b;
+        in >> comands;
+        while(!comands.isEmpty()){
+            b = comands.takeAt(0);
+            QDataStream in1(&b, QIODevice::ReadOnly);
+            in1 >> command;
+            doComand(command , in1);
         }
-        tc.setPosition(lPos);
-        ui->plainTextEdit->setTextCursor(tc);
+    }
 
-        iRead = false;
-    }
-        break;
-    case user::usersList:{
-        iRead = true;
-        QString users, files;
-        in >> users >> files;
-        QStringList l;
-        ui->users->clear();
-        if (users != ""){
-            l =  users.split(",");
-            ui->users->addItems(l);
-        }
-        if (ui->plainTextEdit->toPlainText().isEmpty()){
-            ui->plainTextEdit->setPlainText(files);
-            current = files;
-        }
-        iRead = false;
-    }
-        break;
-    case user::filesList:{
-        QString files;
-        in >> files;
-        if (files == "")
-            return;
-        QStringList l =  files.split(",");
-
-        ui->files->addItems(l);
-    }
-    case user::errorNaimIsUsed:{
-        ui->connectDisConnect->setText("Подключиться");
-        QMessageBox::critical(this, "Ошибка соединения с сервером!", "Пользователь с таким именем уже существует.");
-        sok->disconnectFromHost();
-        ui->plainTextEdit->setEnabled(false);
-    }
-        break;
-    case user::disconnectd:{
-        sok->disconnect();
-    }
-        break;
-    default:
-        break;
-    }
 }
 
 void notepadWindow::onSokDisplayError(QAbstractSocket::SocketError socketError)
@@ -173,10 +112,8 @@ void notepadWindow::on_plainTextEdit_textChanged()
         editType et;
         QString text = ui->plainTextEdit->toPlainText();
         QString diff = getDiff(text , localPos, ui->plainTextEdit->textCursor().position(), et);
-        out << (quint16)0 << user::editFile << (int)et << localPos << ui->plainTextEdit->textCursor().position() << diff;
-        out.device()->seek(0);
-        out << (quint16)(block.size() - sizeof(quint16));
-        sok->write(block);
+        out << user::editFile << (int)et << localPos << ui->plainTextEdit->textCursor().position() << diff;
+        textEditList.append(block);
         current = ui->plainTextEdit->toPlainText();
 
     }
@@ -188,12 +125,9 @@ void notepadWindow::on_files_currentRowChanged(int currentRow)
     blockSize = 0;
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << (quint16)0;
     out << (quint8)user::chaingCurFile;
     out <<  ui->files->currentItem()->text();
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
-    sok->write(block);
+    textEditList.append(block);
     ui->plainTextEdit->setEnabled(true);
 }
 
@@ -203,6 +137,15 @@ void notepadWindow::on_plainTextEdit_cursorPositionChanged()
     lastPos = pos;
     pos = ui->plainTextEdit->textCursor().position();
 
+}
+
+void notepadWindow::send()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out << user::list << textEditList;
+    textEditList.clear();
+    sok->write(block);
 }
 
 
@@ -216,10 +159,8 @@ void notepadWindow::keyPressEventT(QKeyEvent *e)
         editType et;
         QString text = ui->plainTextEdit->toPlainText();
         QString diff = getDiff(text , pos, pos, et);
-        out << (quint16)0 << user::editFile << (int)et << localPos << localPos << diff;
-        out.device()->seek(0);
-        out << (quint16)(block.size() - sizeof(quint16));
-        sok->write(block);
+        out << user::editFile << (int)et << localPos << localPos << diff;
+        textEditList.append(block);
         current = updateText(ui->plainTextEdit->toPlainText(), et, localPos, localPos, diff);
 
     }
@@ -243,4 +184,58 @@ bool notepadWindow::save()
     f.write(ui->plainTextEdit->toPlainText().toUtf8());
     f.close();
     return true;
+}
+
+void notepadWindow::doComand(qint8 com, QDataStream &in)
+{
+    switch (com) {
+    case user::editFile:{
+        QString diff;
+        int type, start, end;
+        in >> type >> start >> end >> diff;
+        iRead = true;
+        //обрабатываем
+        int lPos = pos;
+        ui->plainTextEdit->setPlainText(updateText(ui->plainTextEdit->toPlainText(), (editType)type, start, end, diff));
+        QTextCursor tc= ui->plainTextEdit->textCursor();
+        if (start <= lPos){
+            lPos += end - start;
+        }
+        tc.setPosition(lPos);
+        ui->plainTextEdit->setTextCursor(tc);
+
+        iRead = false;
+    }
+        break;
+    case user::usersList:{
+        iRead = true;
+        QString users, files;
+        in >> users >> files;
+        QStringList l;
+        ui->users->clear();
+        if (users != ""){
+            l =  users.split(",");
+            ui->users->addItems(l);
+        }
+        if (ui->plainTextEdit->toPlainText().isEmpty()){
+            ui->plainTextEdit->setPlainText(files);
+            current = files;
+        }
+        iRead = false;
+    }
+        break;
+    case user::errorNaimIsUsed:{
+        ui->connectDisConnect->setText("Подключиться");
+        QMessageBox::critical(this, "Ошибка соединения с сервером!", "Пользователь с таким именем уже существует.");
+        sok->disconnectFromHost();
+        ui->plainTextEdit->setEnabled(false);
+    }
+        break;
+    case user::disconnectd:{
+        sok->disconnect();
+    }
+        break;
+    default:
+        break;
+    }
 }
