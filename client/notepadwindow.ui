@@ -158,7 +158,7 @@
        <item>
         <widget class="QGroupBox" name="usersBox">
          <property name="title">
-          <string>Полльзователи</string>
+          <string>Пользователи</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
