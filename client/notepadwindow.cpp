@@ -8,6 +8,7 @@ notepadWindow::notepadWindow(QWidget *parent) :
     ui->setupUi(this);
     iRead = false;
     tChaing = false;
+    haveError = false;
     sok = new QTcpSocket(this);
     pos = 0;
     t = new QTimer;
@@ -29,7 +30,10 @@ notepadWindow::~notepadWindow()
 
 void notepadWindow::onSokConnected()
 {
-    blockSize = 0;
+
+    ui->connectDisConnect->setText("Отключиться");
+    ui->plainTextEdit->setEnabled(true);
+
     qDebug() << "Connected";
 
     QByteArray block;
@@ -46,12 +50,13 @@ void notepadWindow::onSokDisconnected()
     ui->ip->setEnabled(true);
     ui->port->setEnabled(true);
     ui->connectDisConnect->setText("Подключиться");
-    if (QMessageBox::Ok == QMessageBox::warning(this, "Соединение с сервером было потеряно", "Вы хотите сохранить документ в файл?", QMessageBox::Ok, QMessageBox::Cancel)){
+    if (!haveError && QMessageBox::Ok == QMessageBox::warning(this, "Соединение с сервером было потеряно", "Вы хотите сохранить документ в файл?", QMessageBox::Ok, QMessageBox::Cancel)){
         if (!save())
             QMessageBox::critical(this, "Что-то пошло не так!", "Не удалось сохранить файл");
 
     }
     ui->plainTextEdit->clear();
+    haveError = false;
 }
 
 void notepadWindow::onSokReadyRead()
@@ -86,20 +91,13 @@ void notepadWindow::onSokDisplayError(QAbstractSocket::SocketError socketError)
 void notepadWindow::on_connectDisConnect_clicked()
 {
     if (ui->connectDisConnect->text() == "Подключиться"){
-        ui->connectDisConnect->setText("Отключиться");
         sok->connectToHost(ui->ip->text(), ui->port->value());
-        ui->plainTextEdit->setEnabled(true);
     }
     else{
         ui->connectDisConnect->setText("Подключиться");
         sok->disconnectFromHost();
         ui->plainTextEdit->setEnabled(false);
     }
-}
-
-void notepadWindow::on_files_currentTextChanged(const QString &currentText)
-{
-
 }
 
 void notepadWindow::on_plainTextEdit_textChanged()
@@ -120,17 +118,6 @@ void notepadWindow::on_plainTextEdit_textChanged()
     tChaing = false;
 }
 
-void notepadWindow::on_files_currentRowChanged(int currentRow)
-{
-    blockSize = 0;
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out << (quint8)user::chaingCurFile;
-    out <<  ui->files->currentItem()->text();
-    textEditList.append(block);
-    ui->plainTextEdit->setEnabled(true);
-}
-
 void notepadWindow::on_plainTextEdit_cursorPositionChanged()
 {
 
@@ -141,6 +128,7 @@ void notepadWindow::on_plainTextEdit_cursorPositionChanged()
 
 void notepadWindow::send()
 {
+    if (textEditList.isEmpty()) return;
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out << user::list << textEditList;
@@ -225,6 +213,7 @@ void notepadWindow::doComand(qint8 com, QDataStream &in)
     }
         break;
     case user::errorNaimIsUsed:{
+        haveError = true;
         ui->connectDisConnect->setText("Подключиться");
         QMessageBox::critical(this, "Ошибка соединения с сервером!", "Пользователь с таким именем уже существует.");
         sok->disconnectFromHost();

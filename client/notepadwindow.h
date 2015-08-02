@@ -7,6 +7,7 @@
 #include "server/user.h"
 #include "server/textcorefunc.h"
 #include <QTimer>
+#include <windows.h>
 namespace Ui {
 class notepadWindow;
 }
@@ -20,36 +21,85 @@ public:
     ~notepadWindow();
 
 private slots:
+    /*!
+     * \brief onSokConnected - Слот обрабатывающий подключение
+     */
     void onSokConnected();
+    /*!
+     * \brief onSokDisconnected - Слот обрабатывающий отключение
+     */
     void onSokDisconnected();
+    /*!
+     * \brief onSokReadyRead - Слот который считывает блок данных по готовности
+     */
     void onSokReadyRead();
+    /*!
+     * \brief onSokDisplayError - Обработчик ошибок
+     * \param e - ошибка
+     */
     void onSokDisplayError(QAbstractSocket::SocketError socketError);
-
+    /*!
+     * \brief on_connectDisConnect_clicked - подключить отключить клиент
+     */
     void on_connectDisConnect_clicked();
-
-    void on_files_currentTextChanged(const QString &currentText);
-
+    /*!
+     * \brief on_plainTextEdit_textChanged - обработчик изменений текста
+     */
     void on_plainTextEdit_textChanged();
-
-    void on_files_currentRowChanged(int currentRow);
-
+    /*!
+     * \brief on_plainTextEdit_cursorPositionChanged - обработчик изменения положения курсора
+     */
     void on_plainTextEdit_cursorPositionChanged();
+    /*!
+     * \brief send - отправка блока сообщений
+     */
     void send();
 public slots:
-
+    /*!
+     * \brief keyPressEventT - обработчик нажатия на клавишу в редакторе
+     * \param e
+     */
     void keyPressEventT(QKeyEvent* e);
+    /*!
+     * \brief saveB - кнопка сохранения
+     */
     void saveB();
+    /*!
+     * \brief save - cj[hfytybt
+     * \return  успешность
+     */
     bool save();
 private:
     Ui::notepadWindow *ui;
+    /*!
+     * \brief sok - Сокет
+     */
     QTcpSocket *sok;
-    quint16 blockSize;
+    /*!
+     * \brief current - текущий текст
+     */
     QString current;
+    /*!
+     * \brief pos, lastPos - позиции курсора
+     */
     int pos, lastPos;
-    bool iRead, tChaing, iDoit;
+    /*!
+     * \brief iRead, tChaing, iDoit, haveError - флаги
+     */
+    bool iRead, tChaing, iDoit, haveError;
+    /*!
+     * \brief textEditList - блок событий
+     */
     QList<QByteArray> textEditList;
+    /*!
+     * \brief t - Таймер синхронизации
+     */
     QTimer *t;
-
+    /*!
+     * \brief doComand - обработчик одного действия
+     * \param com
+     * \param in
+     */
     void doComand(qint8 com, QDataStream &in);
 };
 

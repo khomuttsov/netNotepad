@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    s = new server(this, this);
+    s = new server(this);
     s->start(QHostAddress::LocalHost, 1234);
     connect(s, SIGNAL(log(QString)), this, SLOT(printLog(QString)));
 }

@@ -9,31 +9,73 @@
 #include "server.h"
 
 class server;
+/*!
+ * \brief The user class - класс клиента
+ */
 class user : public QObject
 {
     Q_OBJECT
     friend class server;
 public:
     explicit user(int desc, server *serv, QObject *parent = 0);
-    inline QString getCurrentFile() const { return currentFile; }
+    /*!
+     * \brief isAutchedUser - Прошел ли пользователь авторизацию
+     * \return да\нет
+     */
     inline bool isAutchedUser() const { return isAutched; }
+    /*!
+     * \brief getSocket - Получить сокет используемый пользователем
+     * \return да\нет
+     */
     inline QTcpSocket *getSocket() const { return socket; }
+    /*!
+     * \brief getName - Получить имя пользователя
+     * \return имя
+     */
     inline QString getName() const { return name; }
+    /*!
+     * \brief send - Прередать команду клиенту
+     * \param c - команда
+     */
     void send(qint8 c);
 private:
+    /*!
+     * \brief socket - сокет для связи с клиентом
+     */
     QTcpSocket *socket;
+    /*!
+     * \brief host - указатель на объект сервера
+     */
     server *host;
+    /*!
+     * \brief name - Имя пользователя
+     */
     QString name;
-    QString currentFile;
-    qint16 blockSize;
+    /*!
+     * \brief isAutched - Авторизовался ли пользователь
+     */
     bool isAutched;
-
+    /*!
+     * \brief sendUsers - Отправить список пользователей
+     */
     void sendUsers();
-    void sendFiles();
 private slots:
+    /*!
+     * \brief onConnect - Слот обрабатывающий подключение
+     */
     void onConnect();
+    /*!
+     * \brief onDisconnect - Слот обрабатывающий отключение
+     */
     void onDisconnect();
+    /*!
+     * \brief onReadyRead - Слот который считывает блок данных по готовности
+     */
     void onReadyRead();
+    /*!
+     * \brief onError - Обработчик ошибок
+     * \param e - ошибка
+     */
     void onError(QAbstractSocket::SocketError e);
 
 
@@ -42,7 +84,6 @@ public:
     static const quint8 editFile = 2;
     static const quint8 usersList = 3;
     static const quint8 filesList = 4;
-    static const quint8 chaingCurFile = 5;
     static const quint8 list = 6;
     static const quint8 errorNaimIsUsed = 202;
     static const quint8 disconnectd = 203;

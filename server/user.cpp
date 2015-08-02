@@ -4,10 +4,8 @@ user::user(int desc, server *serv, QObject *parent) : QObject(parent)
 {
     host = serv;
     isAutched = false;
-    blockSize = 0;
     socket = new QTcpSocket(this);
     socket->setSocketDescriptor(desc);
-    currentFile = "test.cpp";
     connect(socket, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
@@ -26,15 +24,7 @@ void user::sendUsers()
 {
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << usersList << host->getUsers(this) << host->files.value("test.cpp");
-    socket->write(block);
-}
-
-void user::sendFiles()
-{
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out << filesList << host->getFiles();
+    out << usersList << host->getUsers(this) << host->file;
     socket->write(block);
 }
 
@@ -99,14 +89,6 @@ void user::onReadyRead()
         //отправляем его остальным
         host->textEdit(this, textEditList);
 
-    }
-        break;
-    case chaingCurFile:{
-        QString file;
-        in >> file;
-        //отправляем его остальным
-        currentFile = file;
-        emit host->log(name + " " + file);
     }
         break;
     }

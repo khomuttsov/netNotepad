@@ -1,20 +1,19 @@
 #include "server.h"
 
-server::server(QWidget *widget, QObject *parent) :QTcpServer(parent), _widget(widget)
+server::server(QObject *parent) :QTcpServer(parent)
 {
-    files.insert("test.cpp", "");
-    f = new QFile("test.cpp");
+    f = new QFile("date.txt");
     if (f->open(QIODevice::ReadOnly)){
-       files.insert("test.cpp", QString(f->readAll()));
+       file = QString(f->readAll());
        f->close();
     }
 }
 
-void server::textEdit(user *ho, QString file, editType type, int coursorStart, int coursorEnd, QString diff)
+void server::textEdit(user *ho, editType type, int coursorStart, int coursorEnd, QString diff)
 {
-    files.insert("test.cpp", updateText(files.value("test.cpp"), type, coursorStart, coursorEnd, diff));
+    file = updateText(file, type, coursorStart, coursorEnd, diff);
     f->open(QIODevice::WriteOnly);
-    f->write(files.value("test.cpp").toUtf8());
+    f->write(file.toUtf8());
     f->close();
 
     QByteArray block;
@@ -23,8 +22,8 @@ void server::textEdit(user *ho, QString file, editType type, int coursorStart, i
 
 
     for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
-        emit log ((*i)->getCurrentFile() +" "+ (*i)->getName() + " " + QString::number((int)(*i)->isAutchedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
-        if ((*i)->isAutchedUser() && *i != ho && (*i)->getCurrentFile() == file){
+        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAutchedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
+        if ((*i)->isAutchedUser() && *i != ho){
             (*i)->getSocket()->write(block);
         }
     }
@@ -43,10 +42,10 @@ void server::textEdit(user *ho, QList<QByteArray> comands)
         b = comands1.takeAt(0);
         QDataStream in1(&b, QIODevice::ReadOnly);
         in1 >> type >> coursorStart >> coursorEnd >> diff;
-        files.insert("test.cpp", updateText(files.value("test.cpp"), (editType)type, coursorStart, coursorEnd, diff));
+        file = updateText(file, (editType)type, coursorStart, coursorEnd, diff);
     }
     f->open(QIODevice::WriteOnly);
-    f->write(files.value("test.cpp").toUtf8());
+    f->write(file.toUtf8());
     f->close();
 
     QByteArray block;
@@ -55,7 +54,7 @@ void server::textEdit(user *ho, QList<QByteArray> comands)
 
 
     for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
-        emit log ((*i)->getCurrentFile() +" "+ (*i)->getName() + " " + QString::number((int)(*i)->isAutchedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
+        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAutchedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
         if ((*i)->isAutchedUser() && *i != ho){
             (*i)->getSocket()->write(block);
         }
@@ -101,16 +100,6 @@ QString server::getUsers(user *without) const
     }
     res.remove(res.length() - 1, 1);
     return res;
-}
-
-QString server::getFiles() const
-{    QString res;
-     for (QMap<QString, QString>::const_iterator i = files.begin(); i != files.end(); ++i){
-             res += i.key() + ",";
-     }
-     res.remove(res.length() - 1, 1);
-     return res;
-
 }
 
 void server::incomingConnection(qintptr handle)

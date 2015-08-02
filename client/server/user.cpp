@@ -4,10 +4,8 @@ user::user(int desc, server *serv, QObject *parent) : QObject(parent)
 {
     host = serv;
     isAutched = false;
-    blockSize = 0;
     socket = new QTcpSocket(this);
     socket->setSocketDescriptor(desc);
-    currentFile = "test.cpp";
     connect(socket, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
@@ -18,10 +16,7 @@ void user::send(qint8 c)
 {
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << (quint16)0;
     out << c;
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
     socket->write(block);
 }
 
@@ -29,21 +24,7 @@ void user::sendUsers()
 {
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << (quint16)0;
-    out << usersList << host->getUsers(this) << host->files.value("test.cpp");
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
-    socket->write(block);
-}
-
-void user::sendFiles()
-{
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out << (quint16)0;
-    out << filesList << host->getFiles();
-    out.device()->seek(0);
-    out << (quint16)(block.size() - sizeof(quint16));
+    out << usersList << host->getUsers(this) << host->file;
     socket->write(block);
 }
 
@@ -64,25 +45,10 @@ void user::onDisconnect()
 void user::onReadyRead()
 {
     QDataStream in(socket);
-    //если считываем новый блок первые 2 байта это его размер
-    if (blockSize == 0) {
-        //если пришло меньше 2 байт ждем пока будет 2 байта
-        if (socket->bytesAvailable() < (int)sizeof(quint16))
-            return;
-        //считываем размер (2 байта)
-        in >> blockSize;
-        qDebug() << "Размер блока:" << blockSize;
-    }
-    //ждем пока блок прийдет полностью
-    if (socket->bytesAvailable() < blockSize)
-        return;
-    else
-        blockSize = 0; //можно принимать новый блок
 
     //3 байт - команда серверу
     quint8 command;
     in >> command;
-    qDebug() << "Код команды:" << command;
     //для неавторизованный пользователей принимается только команда "запрос на авторизацию"
     if (!isAutched && command != autch)
         return;
@@ -117,21 +83,12 @@ void user::onReadyRead()
         // host->doSendToAllUserJoin(_name);
     }
         break;
-    case editFile:{
-        QString diff;
-        int type, start, end;
-        in >> type >> start >> end >> diff;
+    case list:{
+        QList<QByteArray> textEditList;
+        in >> textEditList;
         //отправляем его остальным
-        host->textEdit(this, currentFile, (editType) type, start, end, diff);
+        host->textEdit(this, textEditList);
 
-    }
-        break;
-    case chaingCurFile:{
-        QString file;
-        in >> file;
-        //отправляем его остальным
-        currentFile = file;
-        emit host->log(name + " " + file);
     }
         break;
     }
