@@ -54,6 +54,7 @@ QString updateText(const QString &t, editType type, int start, int end, int anch
 
 QString getDiff(QString &t, int start, int end, int anchor, editType &type)
 {
+    qDebug() << anchor;
     QString res;
     if (start < end){
         type = INSERT;

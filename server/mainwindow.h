@@ -33,9 +33,9 @@ private slots:
      */
     void printLog(QString s);
     /*!
-     * \brief on_connect_clicked - подключить отключить сервер
+     * \brief onСonnectСlicked - подключить отключить сервер
      */
-    void on_connect_clicked();
+    void onConnectClicked();
 };
 
 #endif // MAINWINDOW_H

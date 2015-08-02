@@ -9,7 +9,7 @@ server::server(QObject *parent) :QTcpServer(parent)
     }
 }
 
-void server::textEdit(user *ho, editType type, int coursorStart, int coursorEnd, int anchor, QString diff)
+void server::textEdit(user *who, editType type, int coursorStart, int coursorEnd, int anchor, QString diff)
 {
     file = updateText(file, type, coursorStart, coursorEnd, anchor, diff);
     f->open(QIODevice::WriteOnly);
@@ -22,14 +22,14 @@ void server::textEdit(user *ho, editType type, int coursorStart, int coursorEnd,
 
 
     for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
-        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAuthentificatedUsere()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
-        if ((*i)->isAuthentificatedUsere() && *i != ho){
+        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAuthentificatedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
+        if ((*i)->isAuthentificatedUser() && *i != who){
             (*i)->getSocket()->write(block);
         }
     }
 }
 
-void server::textEdit(user *ho, QList<QByteArray> comands)
+void server::textEdit(user *who, QList<QByteArray> comands)
 {
     int type;
     int coursorStart;
@@ -56,8 +56,8 @@ void server::textEdit(user *ho, QList<QByteArray> comands)
 
 
     for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
-        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAuthentificatedUsere()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
-        if ((*i)->isAuthentificatedUsere() && *i != ho){
+        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAuthentificatedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
+        if ((*i)->isAuthentificatedUser() && *i != who){
             (*i)->getSocket()->write(block);
         }
     }
@@ -66,7 +66,7 @@ void server::textEdit(user *ho, QList<QByteArray> comands)
 bool server::isNameUsed(QString n) const
 {
     for (QList<user*>::const_iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
-        if ((*i)->isAuthentificatedUsere() && (*i)->getName() == n){
+        if ((*i)->isAuthentificatedUser() && (*i)->getName() == n){
             return true;
         }
     }
@@ -96,7 +96,7 @@ QString server::getUsers(user *without) const
 {
     QString res;
     for (QList<user*>::const_iterator i = clients.begin(); i != clients.end(); ++i){
-        if ((*i)->isAuthentificatedUsere() && *i != without){
+        if ((*i)->isAuthentificatedUser() && *i != without){
             res += (*i)->getName() + ",";
         }
     }

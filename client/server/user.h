@@ -17,12 +17,18 @@ class user : public QObject
     Q_OBJECT
     friend class server;
 public:
+    /*!
+     * \brief user - Конструктор создающий пользователя сервера с заданым дескриптором
+     * \param desc - дескриптор
+     * \param serv - сервер
+     * \param parent - объект родитель
+     */
     explicit user(int desc, server *serv, QObject *parent = 0);
     /*!
-     * \brief isAuthentificatedUsere - Прошел ли пользователь авторизацию
+     * \brief isAuthentificatedUser - Прошел ли пользователь авторизацию
      * \return да\нет
      */
-    inline bool isAuthentificatedUsere() const { return isAuthentificated; }
+    inline bool isAuthentificatedUser() const { return isAuthentificated; }
     /*!
      * \brief getSocket - Получить сокет используемый пользователем
      * \return да\нет
@@ -80,13 +86,30 @@ private slots:
 
 
 public:
+    /*!
+     * \brief authentificate - запрос авторизации
+     */
     static const quint8 authentificate = 1;
+    /*!
+     * \brief editFile - Запрос на передачу изменений текста
+     */
     static const quint8 editFile = 2;
+    /*!
+     * \brief usersList - Запрос на получение списка пользователей
+     */
     static const quint8 usersList = 3;
-    static const quint8 filesList = 4;
-    static const quint8 list = 6;
-    static const quint8 errorNameIsUsed = 202;
-    static const quint8 disconnected = 203;
+    /*!
+     * \brief list - Запрос на передачу списка изменений текста
+     */
+    static const quint8 list = 4;
+    /*!
+     * \brief errorNameIsUsed - Запрос на передачу сообщения о том что данное имя занято
+     */
+    static const quint8 errorNameIsUsed = 10;
+    /*!
+     * \brief disconnected - Запрос на разрыв соеденения
+     */
+    static const quint8 disconnected = 11;
 };
 
 #endif // USER_H

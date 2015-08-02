@@ -1,6 +1,10 @@
 #ifndef TEXTCOREFUNC_H
 #define TEXTCOREFUNC_H
 #include "QString"
+#include <QDebug>
+/*!
+ * \brief The editType enum - типы редактирования текста
+ */
 enum editType{
     INSERT,
     BACKSPACE,

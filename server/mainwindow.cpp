@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     s = new server(this);
     s->start(QHostAddress::LocalHost, 1234);
+    connect(ui->connect, SIGNAL(clicked(bool)), this, SLOT(onСonnectСlicked()));
     connect(s, SIGNAL(log(QString)), this, SLOT(printLog(QString)));
 }
 
@@ -21,7 +22,7 @@ void MainWindow::printLog(QString s)
     ui->log->append(s);
 }
 
-void MainWindow::on_connect_clicked()
+void MainWindow::onConnectClicked()
 {
     if (ui->connect->text() == "Остановить"){
         s->stop();

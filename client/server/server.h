@@ -19,19 +19,20 @@ public:
     explicit server(QObject *parent = 0);
     /*!
      * \brief textEdit - обработать еденичное изменение текста
-     * \param ho - от кого
+     * \param who - от кого
      * \param type - тип изменений
      * \param coursorStart - начало
      * \param coursorEnd -конец
+     * \param coursorEnd - курсор в начале выделения
      * \param diff -разница
      */
-    void textEdit(user* ho, editType type, int coursorStart, int coursorEnd, int anchor, QString diff);
+    void textEdit(user* who, editType type, int coursorStart, int coursorEnd, int anchor, QString diff);
     /*!
      * \brief textEdit - обработать блок изменений текста
-     * \param ho - от какого пользователя
+     * \param who - от какого пользователя
      * \param comands - блок
      */
-    void textEdit(user *ho, QList<QByteArray> comands);
+    void textEdit(user *who, QList<QByteArray> comands);
     /*!
      * \brief isNameUsed - проверяет является ли имя занятым
      * \param n -имя
