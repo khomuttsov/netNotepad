@@ -22,8 +22,8 @@ void server::textEdit(user *ho, editType type, int coursorStart, int coursorEnd,
 
 
     for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
-        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAutchedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
-        if ((*i)->isAutchedUser() && *i != ho){
+        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAuthentificatedUsere()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
+        if ((*i)->isAuthentificatedUsere() && *i != ho){
             (*i)->getSocket()->write(block);
         }
     }
@@ -56,8 +56,8 @@ void server::textEdit(user *ho, QList<QByteArray> comands)
 
 
     for (QList<user*>::iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
-        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAutchedUser()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
-        if ((*i)->isAutchedUser() && *i != ho){
+        emit log ((*i)->getName() + " " + QString::number((int)(*i)->isAuthentificatedUsere()) + " " + QString::number(type)+" "+QString::number(coursorStart)+" "+QString::number(coursorEnd)+" "+diff);
+        if ((*i)->isAuthentificatedUsere() && *i != ho){
             (*i)->getSocket()->write(block);
         }
     }
@@ -66,7 +66,7 @@ void server::textEdit(user *ho, QList<QByteArray> comands)
 bool server::isNameUsed(QString n) const
 {
     for (QList<user*>::const_iterator i = clients.begin(); i != clients.end(); ++i){ // Передаем изменения всем клиентам редактирующим текущий файл
-        if ((*i)->isAutchedUser() && (*i)->getName() == n){
+        if ((*i)->isAuthentificatedUsere() && (*i)->getName() == n){
             return true;
         }
     }
@@ -87,7 +87,7 @@ bool server::start(QHostAddress addr, qint16 port)
 void server::stop()
 {
     for (QList<user*>::const_iterator i = clients.begin(); i != clients.end(); ++i){
-        (*i)->send(user::disconnectd);
+        (*i)->send(user::disconnected);
     }
     close();
 }
@@ -96,7 +96,7 @@ QString server::getUsers(user *without) const
 {
     QString res;
     for (QList<user*>::const_iterator i = clients.begin(); i != clients.end(); ++i){
-        if ((*i)->isAutchedUser() && *i != without){
+        if ((*i)->isAuthentificatedUsere() && *i != without){
             res += (*i)->getName() + ",";
         }
     }

@@ -19,10 +19,10 @@ class user : public QObject
 public:
     explicit user(int desc, server *serv, QObject *parent = 0);
     /*!
-     * \brief isAutchedUser - Прошел ли пользователь авторизацию
+     * \brief isAuthentificatedUsere - Прошел ли пользователь авторизацию
      * \return да\нет
      */
-    inline bool isAutchedUser() const { return isAutched; }
+    inline bool isAuthentificatedUsere() const { return isAuthentificated; }
     /*!
      * \brief getSocket - Получить сокет используемый пользователем
      * \return да\нет
@@ -54,7 +54,7 @@ private:
     /*!
      * \brief isAutched - Авторизовался ли пользователь
      */
-    bool isAutched;
+    bool isAuthentificated;
     /*!
      * \brief sendUsers - Отправить список пользователей
      */
@@ -80,13 +80,13 @@ private slots:
 
 
 public:
-    static const quint8 autch = 1;
+    static const quint8 authentificate = 1;
     static const quint8 editFile = 2;
     static const quint8 usersList = 3;
     static const quint8 filesList = 4;
     static const quint8 list = 6;
-    static const quint8 errorNaimIsUsed = 202;
-    static const quint8 disconnectd = 203;
+    static const quint8 errorNameIsUsed = 202;
+    static const quint8 disconnected = 203;
 };
 
 #endif // USER_H

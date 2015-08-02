@@ -3,7 +3,7 @@
 user::user(int desc, server *serv, QObject *parent) : QObject(parent)
 {
     host = serv;
-    isAutched = false;
+    isAuthentificated = false;
     socket = new QTcpSocket(this);
     socket->setSocketDescriptor(desc);
     connect(socket, SIGNAL(connected()), this, SLOT(onConnect()));
@@ -50,13 +50,13 @@ void user::onReadyRead()
     quint8 command;
     in >> command;
     //для неавторизованный пользователей принимается только команда "запрос на авторизацию"
-    if (!isAutched && command != autch)
+    if (!isAuthentificated && command != authentificate)
         return;
 
     switch(command)
     {
     //запрос на авторизацию
-    case autch:{
+    case authentificate:{
         //считываем имя
         QString name;
         in >> name;
@@ -65,12 +65,12 @@ void user::onReadyRead()
         if (host->isNameUsed(name))
         {
             //отправляем ошибку
-            send(errorNaimIsUsed);
+            send(errorNameIsUsed);
             return;
         }
         //авторизация пройдена
         this->name = name;
-        isAutched = true;
+        isAuthentificated = true;
         //отправляем новому клиенту список активных пользователей
         for (QList<user*>::iterator it = host->clients.begin();
              it != host->clients.end(); ++it){

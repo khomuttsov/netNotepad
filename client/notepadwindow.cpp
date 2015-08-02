@@ -39,7 +39,7 @@ void notepadWindow::onSokConnected()
 
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << (quint8)user::autch;
+    out << (quint8)user::authentificate;
     out <<  ui->login->text();
     sok->write(block);
     t->start(500);
@@ -86,7 +86,7 @@ void notepadWindow::onSokReadyRead()
 
 void notepadWindow::onSokDisplayError(QAbstractSocket::SocketError socketError)
 {
-
+    qDebug() << socketError;
 }
 
 void notepadWindow::on_connectDisConnect_clicked()
@@ -215,7 +215,7 @@ void notepadWindow::doComand(quint8 com, QDataStream &in)
         iRead = false;
     }
         break;
-    case user::errorNaimIsUsed:{
+    case user::errorNameIsUsed:{
         haveError = true;
         ui->connectDisConnect->setText("Подключиться");
         QMessageBox::critical(this, "Ошибка соединения с сервером!", "Пользователь с таким именем уже существует.");
@@ -223,7 +223,7 @@ void notepadWindow::doComand(quint8 com, QDataStream &in)
         ui->plainTextEdit->setEnabled(false);
     }
         break;
-    case user::disconnectd:{
+    case user::disconnected:{
         sok->disconnect();
     }
         break;
